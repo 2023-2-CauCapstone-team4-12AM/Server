@@ -40,7 +40,8 @@ public class SecurityConfig {
                                         "user/login/**",
                                         "user/sign-up/**",
                                         "user/send-email-code/**",
-                                        "user/check-email-code/**").permitAll()
+                                        "user/check-email-code/**",
+                                        "user/send-changedPW/**").permitAll()
                                 .anyRequest().permitAll())
                 .sessionManagement((sessionManagement) ->
                 sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

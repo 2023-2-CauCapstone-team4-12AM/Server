@@ -28,7 +28,7 @@ public class UserMemberController {
     public String testMethod(){
         return "success";
     }
-    
+
     @PostMapping("/change-pw")
     public ResponseEntity<Map<String, Object>> changePW(@RequestBody EmailPasswordDto emailPasswordDto){
         log.info("pw 변경 컨드롤러 시작");
@@ -37,7 +37,7 @@ public class UserMemberController {
         if((boolean) result.get("success") == true){
             return new ResponseEntity<>(result, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(result, HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -85,19 +85,19 @@ public class UserMemberController {
         } else{
             Map<String, Object> newFailResult = new HashMap<>();
             result.put("messege","실패하였습니다.");
-            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(result, HttpStatus.UNAUTHORIZED);
         }
     }
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> loginAccount(@RequestBody UserMemberDto userMemberDto){
-
+        log.info("로그인 컨트롤러 시작");
         Map<String, Object> result = userMemberService.loginUser(userMemberDto);
 
         if((boolean) result.get("success") == false) {
 
             result.put("message","로그인 실패");
-            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(result, HttpStatus.UNAUTHORIZED);
         }
 
         result.put("message","로그인 성공");
