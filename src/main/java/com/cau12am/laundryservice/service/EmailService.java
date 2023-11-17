@@ -22,7 +22,7 @@ public class EmailService {
         Map<String, Object> result = new HashMap<>();
         try {
             javaMailSender.send(emailForm);
-            return "전송 완료";
+            return "메일 전송 완료";
         } catch (RuntimeException e) {
             log.info("메일 전송 실패");
             throw new RuntimeException(e);

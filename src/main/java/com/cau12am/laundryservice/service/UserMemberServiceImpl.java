@@ -31,9 +31,80 @@ public class UserMemberServiceImpl implements IUserMemberService {
 
     private final EmailCodeRepository emailCodeRepository;
 
+
+    public Map<String, Object> changePW(String email, String nowPW, String newPW) {
+        log.info(" pw 변경 서비스 시작");
+        Map<String, Object> result = new HashMap<>();
+        UserMember checkMember = userMemberRepository.findOneByEmail(email).orElse(null);
+
+        if(checkMember == null){
+            result.put("success", false);
+            result.put("message", "메일이 존재 하지 않습니다.");
+            return result;
+        }
+
+        if(passwordEncoder.matches(nowPW, checkMember.getPw())){
+            UserMember newUser = UserMember.builder()
+                    ._id(checkMember.get_id())
+                    .email(checkMember.getEmail())
+                    .pw(passwordEncoder.encode(newPW))
+                    .name(checkMember.getName())
+                    .refreshToken(checkMember.getRefreshToken())
+                    .studentID(checkMember.getStudentID())
+                    .sex(checkMember.getSex())
+                    .build();
+
+            userMemberRepository.save(newUser);
+
+            result.put("success", true);
+            result.put("message", "변경 완료");
+            return result;
+
+        } else{
+            result.put("success", false);
+            result.put("message", "현재 pw가 일치하지 않습니다.");
+            return result;
+        }
+    }
+
+    public Map<String, Object> sendEmailWithPW(String email) {
+        log.info(" pw 이메일 전송 서비스 시작");
+        Map<String, Object> result = new HashMap<>();
+        UserMember checkMember = userMemberRepository.findOneByEmail(email).orElse(null);
+        if(checkMember != null){
+            String title = "회원 임시 번호";
+
+            SecureRandom secureRandom = new SecureRandom();
+
+            String code = String.valueOf(secureRandom.nextInt(1000000,9999999));
+
+            UserMember newUser = UserMember.builder()
+                    ._id(checkMember.get_id())
+                    .email(checkMember.getEmail())
+                    .pw(passwordEncoder.encode(code))
+                    .name(checkMember.getName())
+                    .refreshToken(checkMember.getRefreshToken())
+                    .studentID(checkMember.getStudentID())
+                    .sex(checkMember.getSex())
+                    .build();
+
+            userMemberRepository.save(newUser);
+
+            String res = emailService.sendMail(email, title, code);
+
+            result.put("success", true);
+            result.put("message", res);
+            return result;
+        }
+
+        result.put("success", false);
+        result.put("message", "메일이 존재 하지 않습니다.");
+        return result;
+    }
+
     @Override
     public Map<String, Object> sendEmailWithCode(String email) {
-        log.info("이메일 전송 서비스 시작");
+        log.info("인증 이메일 전송 서비스 시작");
         Map<String, Object> result = new HashMap<>();
         UserMember checkMember = userMemberRepository.findOneByEmail(email).orElse(null);
         if(checkMember == null){
@@ -50,10 +121,10 @@ public class UserMemberServiceImpl implements IUserMemberService {
                     .check(false)
                     .build());
 
-            emailService.sendMail(email, title, code);
+            String res = emailService.sendMail(email, title, code);
 
             result.put("success", true);
-            result.put("message", "인증번호를 전송하였습니다.");
+            result.put("message", res);
             return result;
         }
 

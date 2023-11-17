@@ -1,6 +1,7 @@
 package com.cau12am.laundryservice.controller;
 
 import com.cau12am.laundryservice.domain.EmailCodeDto;
+import com.cau12am.laundryservice.domain.EmailPasswordDto;
 import com.cau12am.laundryservice.domain.UserMemberDto;
 import com.cau12am.laundryservice.service.IUserMemberService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,6 +27,30 @@ public class UserMemberController {
     @GetMapping("/test")
     public String testMethod(){
         return "success";
+    }
+    
+    @PostMapping("/change-pw")
+    public ResponseEntity<Map<String, Object>> changePW(@RequestBody EmailPasswordDto emailPasswordDto){
+        log.info("pw 변경 컨드롤러 시작");
+        Map<String, Object> result  = userMemberService.changePW(emailPasswordDto.getEmail(), emailPasswordDto.getNowPW(), emailPasswordDto.getNewPW());
+
+        if((boolean) result.get("success") == true){
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/send-changedPW")
+    public ResponseEntity<Map<String, Object>> sendMailWithPW(@RequestParam(name = "email") @Valid String email){
+        log.info("이메일 코드 패스워드 컨드롤러 시작");
+        Map<String, Object> result  = userMemberService.sendEmailWithPW(email);
+
+        if((boolean) result.get("success") == true){
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/send-email-code")

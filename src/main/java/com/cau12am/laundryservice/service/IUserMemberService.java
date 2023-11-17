@@ -7,6 +7,10 @@ import java.util.Map;
 
 public interface IUserMemberService {
 
+    public Map<String, Object> changePW(String email, String nowPW, String newPW);
+
+    public Map<String, Object> sendEmailWithPW(String email);
+
     public Map<String, Object> sendEmailWithCode(String email);
 
     public Map<String, Object> checkEmailWithCode(String email, String code);
