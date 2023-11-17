@@ -222,13 +222,13 @@ public class UserMemberServiceImpl implements IUserMemberService {
         if(checkMember == null){
             log.info("회원 정보가 없습니다.");
             resultKey.put("success", false);
-            return null;
+            return resultKey;
         }
 
         if(!(checkMember.getEmail().equals(userMemberDto.getEmail()) && passwordEncoder.matches(userMemberDto.getPw(),checkMember.getPw()))){
             log.info("로그인 실패");
             resultKey.put("success", false);
-            return null;
+            return resultKey;
         }
 
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
