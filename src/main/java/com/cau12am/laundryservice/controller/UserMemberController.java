@@ -1,17 +1,14 @@
 package com.cau12am.laundryservice.controller;
 
-import com.cau12am.laundryservice.domain.EmailCodeDto;
-import com.cau12am.laundryservice.domain.EmailPasswordDto;
-import com.cau12am.laundryservice.domain.UserMemberDto;
-import com.cau12am.laundryservice.service.IUserMemberService;
-import jakarta.servlet.http.HttpServletResponse;
+import com.cau12am.laundryservice.domain.Email.EmailCodeDto;
+import com.cau12am.laundryservice.domain.Email.EmailPasswordDto;
+import com.cau12am.laundryservice.domain.User.UserMemberDto;
+import com.cau12am.laundryservice.service.UserMemberService.IUserMemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -102,36 +99,6 @@ public class UserMemberController {
 
         result.put("message","로그인 성공");
 
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
-
-    @GetMapping("/regenerateToken")
-    public ResponseEntity<Map<String, Object>> regenerateToken(@RequestHeader(value = HttpHeaders.AUTHORIZATION) String refreshToken){
-        log.info("재발급 컨트롤러 시작");
-        Map<String, Object> result = userMemberService.reCreateAccessToken(refreshToken);
-
-        if((boolean) result.get("success") == false){
-            result.put("message","발급 실패");
-            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        result.put("message","발급 성공");
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
-
-    @GetMapping("/logout")
-    public ResponseEntity<Map<String, Object>> logoutUser(@RequestHeader(value = HttpHeaders.AUTHORIZATION) String refreshToken){
-
-        SecurityContextHolder.clearContext();
-
-        Map<String, Object> result = userMemberService.logout(refreshToken);
-
-        if((boolean) result.get("success") == false){
-            result.put("message","로그아웃 실패");
-            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        result.put("message","로그아웃 성공");
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

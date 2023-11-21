@@ -1,4 +1,4 @@
-package com.cau12am.laundryservice.domain;
+package com.cau12am.laundryservice.domain.Email;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 

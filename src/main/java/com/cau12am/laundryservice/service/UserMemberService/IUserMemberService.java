@@ -1,7 +1,7 @@
-package com.cau12am.laundryservice.service;
+package com.cau12am.laundryservice.service.UserMemberService;
 
 
-import com.cau12am.laundryservice.domain.UserMemberDto;
+import com.cau12am.laundryservice.domain.User.UserMemberDto;
 
 import java.util.Map;
 
@@ -18,10 +18,6 @@ public interface IUserMemberService {
     public Map<String, Object> createAccount(UserMemberDto userMemberDto);
 
     public Map<String, Object> loginUser(UserMemberDto userMemberDto);
-
-    public Map<String, Object> reCreateAccessToken(String email);
-
-    public Map<String, Object>  logout(String refreshToken);
 
     public Map<String, Object> findUserInfo(String email);
 

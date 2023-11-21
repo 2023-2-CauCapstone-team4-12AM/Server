@@ -1,4 +1,4 @@
-package com.cau12am.laundryservice.domain;
+package com.cau12am.laundryservice.domain.Email;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

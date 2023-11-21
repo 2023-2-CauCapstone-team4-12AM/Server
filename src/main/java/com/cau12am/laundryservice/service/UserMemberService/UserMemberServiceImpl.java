@@ -1,13 +1,14 @@
-package com.cau12am.laundryservice.service;
+package com.cau12am.laundryservice.service.UserMemberService;
 
-import com.cau12am.laundryservice.domain.*;
-import com.cau12am.laundryservice.security.JwtTokenProvider;
+import com.cau12am.laundryservice.domain.Email.EmailCode;
+import com.cau12am.laundryservice.domain.Email.EmailCodeRepository;
+import com.cau12am.laundryservice.domain.User.UserMember;
+import com.cau12am.laundryservice.domain.User.UserMemberDto;
+import com.cau12am.laundryservice.domain.User.UserMemberRepository;
+import com.cau12am.laundryservice.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +17,6 @@ import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -25,10 +25,7 @@ import java.util.Optional;
 public class UserMemberServiceImpl implements IUserMemberService {
     private final UserMemberRepository userMemberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
-
     private final EmailService emailService;
-
     private final EmailCodeRepository emailCodeRepository;
 
 
@@ -49,7 +46,6 @@ public class UserMemberServiceImpl implements IUserMemberService {
                     .email(checkMember.getEmail())
                     .pw(passwordEncoder.encode(newPW))
                     .name(checkMember.getName())
-                    .refreshToken(checkMember.getRefreshToken())
                     .studentID(checkMember.getStudentID())
                     .sex(checkMember.getSex())
                     .build();
@@ -83,7 +79,6 @@ public class UserMemberServiceImpl implements IUserMemberService {
                     .email(checkMember.getEmail())
                     .pw(passwordEncoder.encode(code))
                     .name(checkMember.getName())
-                    .refreshToken(checkMember.getRefreshToken())
                     .studentID(checkMember.getStudentID())
                     .sex(checkMember.getSex())
                     .build();
@@ -179,19 +174,11 @@ public class UserMemberServiceImpl implements IUserMemberService {
 
         if(existResult.isEmpty()){
 
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                    new UsernamePasswordAuthenticationToken(userMemberDto.getEmail(), passwordEncoder.encode(userMemberDto.getPw()));
-
-            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-
-            String accessToken = jwtTokenProvider.createAccessToken(usernamePasswordAuthenticationToken, "user");
-            String refreshToken = jwtTokenProvider.createRefreshToken(usernamePasswordAuthenticationToken, "user");
 
             UserMember newUser = UserMember.builder()
                     .email(userMemberDto.getEmail())
                     .pw(passwordEncoder.encode(userMemberDto.getPw()))
                     .name(userMemberDto.getName())
-                    .refreshToken(refreshToken)
                     .studentID(userMemberDto.getStudentID())
                     .sex(userMemberDto.getSex())
                     .build();
@@ -199,8 +186,6 @@ public class UserMemberServiceImpl implements IUserMemberService {
             userMemberRepository.save(newUser);
             emailCodeRepository.delete(emailCheck);
 
-            data.put("accessToken", accessToken);
-            data.put("refreshToken", refreshToken);
             data.put("success", true);
 
             return data;
@@ -225,106 +210,16 @@ public class UserMemberServiceImpl implements IUserMemberService {
             return resultKey;
         }
 
-        if(!(checkMember.getEmail().equals(userMemberDto.getEmail()) && passwordEncoder.matches(userMemberDto.getPw(),checkMember.getPw()))){
-            log.info("로그인 실패");
-            resultKey.put("success", false);
-            return resultKey;
-        }
-
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                new UsernamePasswordAuthenticationToken(checkMember.getEmail(), checkMember.getPw());
-
-        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-
-        String accessToken = jwtTokenProvider.createAccessToken(usernamePasswordAuthenticationToken, "user");
-        String refreshToken = jwtTokenProvider.createRefreshToken(usernamePasswordAuthenticationToken, "user");
-
-        UserMember newWithToken = UserMember.builder()
-                ._id(checkMember.get_id())
-                .sex(checkMember.getSex())
-                .email(checkMember.getEmail())
-                .pw(checkMember.getPw())
-                .studentID(checkMember.getStudentID())
-                .name(checkMember.getName())
-                .refreshToken(refreshToken)
-                .build();
-
-        userMemberRepository.save(newWithToken);
-
-        resultKey.put("accessToken", accessToken);
-        resultKey.put("refreshToken", refreshToken);
-        resultKey.put("success", true);
-
-        return resultKey;
-    }
-
-    @Override
-    public Map<String, Object> reCreateAccessToken(String refreshToken) {
-
-        Boolean validationCheck = jwtTokenProvider.validateToken(refreshToken);
-        String email = jwtTokenProvider.getEmailFromToken(refreshToken);
-        UserMember user = userMemberRepository.findOneByEmail(email).orElse(null);
-
-        Map<String, Object> resultKey = new HashMap<String, Object>();
-
-        if(user == null){
-            resultKey.put("success", false);
-        }
-
-
-        if(user.getRefreshToken().equals(refreshToken) && validationCheck){
-            Authentication authentication = jwtTokenProvider.createAuthentication(email);
-            String newAccessToken = jwtTokenProvider.createAccessToken(authentication, "user");
-            String newRefreshToken = jwtTokenProvider.createRefreshToken(authentication, "user");
-
-            UserMember newWithToken = UserMember.builder()
-                    ._id(user.get_id())
-                    .sex(user.getSex())
-                    .email(user.getEmail())
-                    .pw(user.getPw())
-                    .studentID(user.getStudentID())
-                    .name(user.getName())
-                    .refreshToken(newRefreshToken)
-                    .build();
-
-            userMemberRepository.save(newWithToken);
-
-            resultKey.put("accessToken", newAccessToken);
-            resultKey.put("refreshToken", newRefreshToken);
+        if(checkMember.getEmail().equals(userMemberDto.getEmail()) && passwordEncoder.matches(userMemberDto.getPw(),checkMember.getPw())){
+            log.info("로그인 성공");
             resultKey.put("success", true);
             return resultKey;
         }
 
+        log.info("로그인 실패");
         resultKey.put("success", false);
         return resultKey;
-    }
 
-    @Override
-    public Map<String, Object> logout(String refreshToken) {
-
-        log.info("로그 아웃 서비스 시작");
-
-        UserMember user = userMemberRepository.findOneByRefreshToken(refreshToken).orElse(null);
-        Map<String, Object> result = new HashMap<>();
-
-        System.out.println(user);
-
-        if(user != null){
-            UserMember removeTokenUser = UserMember.builder()
-                    ._id(user.get_id())
-                    .sex(user.getSex())
-                    .email(user.getEmail())
-                    .pw(user.getPw())
-                    .studentID(user.getStudentID())
-                    .name(user.getName())
-                    .refreshToken(null)
-                    .build();
-            userMemberRepository.save(removeTokenUser);
-            result.put("success",true);
-            return result;
-        }
-        result.put("success",false);
-        return result;
     }
 
     @Override
@@ -370,23 +265,25 @@ public class UserMemberServiceImpl implements IUserMemberService {
         UserMember userMember = userMemberRepository.findOneByEmail(userMemberDto.getEmail()).orElse(null);
         Map<String, Object> result = new HashMap<>();
         if(userMember == null){
+            log.info("1");
             result.put("success", false);
             result.put("message", "이메일을 잘못입력하셨습니다.");
         } else{
             if(passwordEncoder.matches(userMemberDto.getPw(), userMember.getPw())){
+                log.info("2");
                 UserMember newUser = UserMember.builder()
                         ._id(userMember.get_id())
                         .email(userMember.getEmail())
                         .pw(userMember.getPw())
                         .name(userMemberDto.getName())
                         .studentID(userMemberDto.getStudentID())
-                        .refreshToken(userMember.getRefreshToken())
                         .sex(userMember.getSex())
                         .build();
                 userMemberRepository.save(newUser);
                 result.put("success", true);
                 result.put("message", "수정 완료");
             } else{
+                log.info("3");
                 result.put("success", false);
                 result.put("message", "비밀번호를 잘못입력하셨습니다.");
             }

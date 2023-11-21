@@ -1,4 +1,4 @@
-package com.cau12am.laundryservice.domain;
+package com.cau12am.laundryservice.domain.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;

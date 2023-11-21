@@ -1,4 +1,4 @@
-package com.cau12am.laundryservice.domain;
+package com.cau12am.laundryservice.domain.User;
 
 
 import lombok.AllArgsConstructor;
@@ -22,5 +22,4 @@ public class UserMember {
     private String name;
     private String studentID;
     private String sex;
-    private String refreshToken;
 }
