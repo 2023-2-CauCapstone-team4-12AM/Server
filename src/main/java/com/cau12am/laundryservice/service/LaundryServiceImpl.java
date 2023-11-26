@@ -1,10 +1,10 @@
 package com.cau12am.laundryservice.service;
 
 import com.cau12am.laundryservice.domain.Laundry.*;
+import com.cau12am.laundryservice.domain.Match.MatchRepository;
 import com.cau12am.laundryservice.domain.Result.ResultDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Example;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.geo.Point;
@@ -48,7 +48,7 @@ public class LaundryServiceImpl implements ILaundryService {
                 .laundryId(laundryRequestDto.getLaundryId())
                 .email(laundryRequestDto.getEmail())
                 .gender(laundryRequestDto.getGender())
-                .colorTypeList(laundryRequestDto.getColorTypes())
+                .colorTypes(laundryRequestDto.getColorTypes())
                 .weight(laundryRequestDto.getWeight())
                 .machineTypes(laundryRequestDto.getMachineTypes())
                 .extraInfoType(laundryRequestDto.getExtraInfoType())
@@ -97,14 +97,18 @@ public class LaundryServiceImpl implements ILaundryService {
                 .laundryId(origin.getLaundryId())
                 .email(origin.getEmail())
                 .gender(origin.getGender())
-                .colorTypeList(laundryRequestDto.getColorTypes())
+                .colorTypes(laundryRequestDto.getColorTypes())
                 .weight(laundryRequestDto.getWeight())
                 .machineTypes(laundryRequestDto.getMachineTypes())
                 .extraInfoType(laundryRequestDto.getExtraInfoType())
                 .message(laundryRequestDto.getMessage())
-                .date(new Date())
+                .date(origin.getDate())
                 .matched(origin.isMatched())
+                .version(origin.getVersion())
                 .build();
+
         return Optional.of(laundryRequestRepository.save(newData));
     }
+
+
 }

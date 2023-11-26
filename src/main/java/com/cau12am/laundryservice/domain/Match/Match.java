@@ -1,4 +1,4 @@
-package com.cau12am.laundryservice.domain.Laundry;
+package com.cau12am.laundryservice.domain.Match;
 
 import com.cau12am.laundryservice.domain.Laundry.tag.*;
 import lombok.AllArgsConstructor;
@@ -12,24 +12,18 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Date;
 import java.util.List;
 
-@Document(collection = "laundry_request")
+@Document(collection = "match")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LaundryRequest {
+public class Match {
     @Id
     private String _id;
-    private String laundryId;
-    private String email;
-    private Gender gender;
-    private List<ColorType> colorTypes;
-    private Weight weight;
-    private List<MachineType> machineTypes;
-    private ExtraInfoType extraInfoType;
-    private String message;
+    private String requestId;
+    private String url;
+    private List<String> users;
     private Date date;
-    private boolean matched;
     @Version
     private long version;
 }

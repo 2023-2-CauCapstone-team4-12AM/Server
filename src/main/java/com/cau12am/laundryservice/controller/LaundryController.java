@@ -1,9 +1,6 @@
 package com.cau12am.laundryservice.controller;
 
-import com.cau12am.laundryservice.domain.Laundry.LaundryInfo;
-import com.cau12am.laundryservice.domain.Laundry.LaundryRequest;
-import com.cau12am.laundryservice.domain.Laundry.LaundryRequestDto;
-import com.cau12am.laundryservice.domain.Laundry.UserPlaceDto;
+import com.cau12am.laundryservice.domain.Laundry.*;
 import com.cau12am.laundryservice.domain.Result.ResultDto;
 import com.cau12am.laundryservice.domain.Result.ResultLaundryInfoDto;
 import com.cau12am.laundryservice.service.ILaundryService;
@@ -142,4 +139,5 @@ public class LaundryController {
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
 }
