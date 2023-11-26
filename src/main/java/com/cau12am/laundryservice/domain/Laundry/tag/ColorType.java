@@ -1,6 +1,6 @@
 package com.cau12am.laundryservice.domain.Laundry.tag;
 
-public enum ClothesColor {
+public enum ColorType {
     WHITE,
     COLORED,
     BLUE

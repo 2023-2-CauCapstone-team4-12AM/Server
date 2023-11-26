@@ -4,6 +4,7 @@ import com.cau12am.laundryservice.domain.Laundry.LaundryInfo;
 import com.cau12am.laundryservice.domain.Laundry.LaundryRequest;
 import com.cau12am.laundryservice.domain.Laundry.LaundryRequestDto;
 import com.cau12am.laundryservice.domain.Laundry.UserPlaceDto;
+import com.cau12am.laundryservice.domain.Result.ResultDto;
 import com.cau12am.laundryservice.domain.Result.ResultLaundryInfoDto;
 import com.cau12am.laundryservice.service.ILaundryService;
 import jakarta.validation.Valid;
@@ -57,7 +58,6 @@ public class LaundryController {
     public ResponseEntity<Map<String, Object>> saveMyRequest(@RequestBody LaundryRequestDto laundryRequestDto){
         log.info("자신의 요청글 작성 컨트롤러 시작");
 
-        System.out.println(laundryRequestDto);
 
         LaundryRequest saveRequest = iLaundryService.saveRequest(laundryRequestDto);
 
@@ -80,8 +80,8 @@ public class LaundryController {
 
         if(saveRequest.isEmpty()) {
             result.put("success",false);
-            result.put("message","업데이트를 원하는 요청글이 찾을 수 없습니다.");
-            result.put("result", saveRequest.get());
+            result.put("message","업데이트를 할 수 없습니다.");
+            result.put("result", null);
             return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -93,31 +93,31 @@ public class LaundryController {
     }
 
     @DeleteMapping("/myRequest/delete")
-    public ResponseEntity<Map<String, Object>> deleteMyRequest(@RequestHeader (value = "Id") String Id){
+    public ResponseEntity<ResultDto> deleteMyRequest(@RequestParam (value = "Id") String Id){
         log.info("자신이 쓴 요청글 삭제 컨트롤러 시작");
 
-        iLaundryService.deleteRequest(Id);
+        ResultDto deleteResult = iLaundryService.deleteRequest(Id);
 
-        Map<String, Object> result = new HashMap<>();
+        if(!deleteResult.isSuccess()) {
+            return new ResponseEntity<>(deleteResult, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
-        result.put("success",true);
-        result.put("message","삭제 성공");
-
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(deleteResult, HttpStatus.OK);
     }
 
-    @GetMapping("/request/byId")
-    public ResponseEntity<Map<String, Object>> findRequestById(@RequestHeader (value = "Id") String Id){
+    @GetMapping("/request/findById")
+    public ResponseEntity<Map<String, Object>> findRequestById(@RequestParam (value = "Id") String Id){
         log.info("글의 아이디로 요청글 찾는 컨트롤러 시작");
 
+        System.out.println(Id);
         Optional<LaundryRequest> request = iLaundryService.findRequestById(Id);
 
         Map<String, Object> result = new HashMap<>();
 
         if(request.isEmpty()) {
             result.put("success",false);
-            result.put("message","업데이트를 원하는 요청글이 찾을 수 없습니다.");
-            result.put("result", request.get());
+            result.put("message","요청글이 찾을 수 없습니다.");
+            result.put("result", null);
             return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -128,8 +128,8 @@ public class LaundryController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping("/request/byEmail")
-    public ResponseEntity<Map<String, Object>> findRequestsByEmail(@RequestHeader(value = "email") String email){
+    @GetMapping("/request/findByEmail")
+    public ResponseEntity<Map<String, Object>> findRequestsByEmail(@RequestParam(value = "email") String email){
         log.info("글의 아이디로 요청글 찾는 컨트롤러 시작");
 
         List<LaundryRequest> requests = iLaundryService.findAllMyRequestsByEmail(email);

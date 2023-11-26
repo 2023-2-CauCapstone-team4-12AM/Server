@@ -7,10 +7,11 @@ import java.util.List;
 
 @Data
 public class LaundryRequestDto {
+    String _id;
     Gender gender;
     String laundryId;
     String email;
-    List<ClothesColor> clothesColorList;
+    List<ColorType> colorTypes;
     Weight weight;
     List<MachineType> machineTypes;
     ExtraInfoType extraInfoType;

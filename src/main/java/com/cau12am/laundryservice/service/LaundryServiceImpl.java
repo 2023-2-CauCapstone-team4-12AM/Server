@@ -1,6 +1,7 @@
 package com.cau12am.laundryservice.service;
 
 import com.cau12am.laundryservice.domain.Laundry.*;
+import com.cau12am.laundryservice.domain.Result.ResultDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
@@ -28,21 +29,17 @@ public class LaundryServiceImpl implements ILaundryService {
         Point point = new Point(Double.parseDouble(lon), Double.parseDouble(lat));
         Distance distance = new Distance(Double.parseDouble(dis), Metrics.KILOMETERS);
 
-        List<LaundryInfo> nearLaundries = laundryInfoRepository.findByLocationNear( point, distance);
-
-        return nearLaundries;
+        return laundryInfoRepository.findByLocationNear( point, distance);
     }
 
     @Override
     public List<LaundryRequest> findLaundryALLRequests(String laundryId) {
-        List<LaundryRequest> requests = laundryRequestRepository.findByLaundryId(laundryId);
-        return requests;
+        return laundryRequestRepository.findByLaundryIdAndMatchedIsFalse(laundryId);
     }
 
     @Override
     public List<LaundryRequest> findAllMyRequestsByEmail(String email) {
-        List<LaundryRequest> requests = laundryRequestRepository.findByEmail(email);
-        return requests;
+        return laundryRequestRepository.findByEmail(email);
     }
 
     @Override
@@ -51,7 +48,7 @@ public class LaundryServiceImpl implements ILaundryService {
                 .laundryId(laundryRequestDto.getLaundryId())
                 .email(laundryRequestDto.getEmail())
                 .gender(laundryRequestDto.getGender())
-                .clothesColorList(laundryRequestDto.getClothesColorList())
+                .colorTypeList(laundryRequestDto.getColorTypes())
                 .weight(laundryRequestDto.getWeight())
                 .machineTypes(laundryRequestDto.getMachineTypes())
                 .extraInfoType(laundryRequestDto.getExtraInfoType())
@@ -63,19 +60,22 @@ public class LaundryServiceImpl implements ILaundryService {
     }
 
     @Override
-    public void deleteRequest(String Id) {
-        laundryRequestRepository.deleteById(Id);
+    public ResultDto deleteRequest(String Id) {
+        Optional<LaundryRequest> oneById = laundryRequestRepository.findOneBy_id(Id);
+
+        if(oneById.isPresent()){
+            if(!oneById.get().isMatched()){
+                laundryRequestRepository.deleteById(Id);
+                return ResultDto.builder().message("성공").success(true).build();
+            }
+            return ResultDto.builder().message("매칭되어있습니다.").success(false).build();
+        }
+        return ResultDto.builder().message("존재하지않습니다.").success(false).build();
     }
 
     @Override
     public Optional<LaundryRequest> findRequestById(String Id) {
-        return laundryRequestRepository.findOne(
-                Example.of(
-                        LaundryRequest.builder()
-                                ._id(Id)
-                                .build()
-                )
-        );
+        return laundryRequestRepository.findOneBy_id(Id);
     }
 
     @Override
@@ -84,21 +84,27 @@ public class LaundryServiceImpl implements ILaundryService {
 
         if(originalRequest.isEmpty()){
             return Optional.empty();
-        } else {
-            LaundryRequest newData = LaundryRequest.builder()
-                    ._id(originalRequest.get().get_id())
-                    .laundryId(laundryRequestDto.getLaundryId())
-                    .email(laundryRequestDto.getEmail())
-                    .gender(laundryRequestDto.getGender())
-                    .clothesColorList(laundryRequestDto.getClothesColorList())
-                    .weight(laundryRequestDto.getWeight())
-                    .machineTypes(laundryRequestDto.getMachineTypes())
-                    .extraInfoType(laundryRequestDto.getExtraInfoType())
-                    .message(laundryRequestDto.getMessage())
-                    .date(new Date())
-                    .matched(false)
-                    .build();
-            return Optional.of(laundryRequestRepository.save(newData));
         }
+
+        LaundryRequest origin = originalRequest.get();
+
+        if(origin.isMatched()){
+            return Optional.empty();
+        }
+
+        LaundryRequest newData = LaundryRequest.builder()
+                ._id(origin.get_id())
+                .laundryId(origin.getLaundryId())
+                .email(origin.getEmail())
+                .gender(origin.getGender())
+                .colorTypeList(laundryRequestDto.getColorTypes())
+                .weight(laundryRequestDto.getWeight())
+                .machineTypes(laundryRequestDto.getMachineTypes())
+                .extraInfoType(laundryRequestDto.getExtraInfoType())
+                .message(laundryRequestDto.getMessage())
+                .date(new Date())
+                .matched(origin.isMatched())
+                .build();
+        return Optional.of(laundryRequestRepository.save(newData));
     }
 }

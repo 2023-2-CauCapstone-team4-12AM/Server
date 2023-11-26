@@ -22,7 +22,7 @@ public class LaundryRequest {
     private String laundryId;
     private String email;
     private Gender gender;
-    private List<ClothesColor> clothesColorList;
+    private List<ColorType> colorTypeList;
     private Weight weight;
     private List<MachineType> machineTypes;
     private ExtraInfoType extraInfoType;
