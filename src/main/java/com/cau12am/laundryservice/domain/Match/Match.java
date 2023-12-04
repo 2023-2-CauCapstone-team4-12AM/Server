@@ -21,6 +21,7 @@ public class Match {
     @Id
     private String _id;
     private String requestId;
+    private String laundryName;
     private String url;
     private List<String> users;
     private Date date;

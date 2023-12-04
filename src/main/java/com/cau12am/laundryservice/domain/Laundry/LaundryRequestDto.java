@@ -10,6 +10,7 @@ public class LaundryRequestDto {
     String _id;
     Gender gender;
     String laundryId;
+    String laundryName;
     String email;
     List<ColorType> colorTypes;
     Weight weight;

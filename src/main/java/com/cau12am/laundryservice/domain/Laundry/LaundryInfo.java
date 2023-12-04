@@ -18,6 +18,7 @@ public class LaundryInfo {
     @Id
     private String _id;
     private String name;
+    private String roadAddress;
     private String time;
     private GeoJsonPoint location;
 }

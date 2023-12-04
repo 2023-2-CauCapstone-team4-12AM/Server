@@ -21,6 +21,7 @@ public class LaundryRequest {
     @Id
     private String _id;
     private String laundryId;
+    private String laundryName;
     private String email;
     private Gender gender;
     private List<ColorType> colorTypes;

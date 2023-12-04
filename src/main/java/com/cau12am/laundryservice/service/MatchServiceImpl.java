@@ -43,6 +43,7 @@ public class MatchServiceImpl implements IMatchService{
                     LaundryRequest.builder()
                             ._id(laundryRequest.get_id())
                             .laundryId(laundryRequest.getLaundryId())
+                            .laundryName(laundryRequest.getLaundryName())
                             .email(laundryRequest.getEmail())
                             .gender(laundryRequest.getGender())
                             .colorTypes(laundryRequest.getColorTypes())
@@ -62,6 +63,7 @@ public class MatchServiceImpl implements IMatchService{
 
             Match newMatchInfo = Match.builder()
                     .requestId(requestId)
+                    .laundryName(laundryRequest.getLaundryName())
                     .users(userEmails)
                     .url(url)
                     .date(new Date())
@@ -103,6 +105,7 @@ public class MatchServiceImpl implements IMatchService{
                 LaundryRequest.builder()
                         ._id(laundryRequest.get_id())
                         .laundryId(laundryRequest.getLaundryId())
+                        .laundryName(laundryRequest.getLaundryName())
                         .email(laundryRequest.getEmail())
                         .gender(laundryRequest.getGender())
                         .colorTypes(laundryRequest.getColorTypes())

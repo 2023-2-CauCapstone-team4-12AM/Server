@@ -44,8 +44,18 @@ public class LaundryServiceImpl implements ILaundryService {
 
     @Override
     public LaundryRequest saveRequest(LaundryRequestDto laundryRequestDto) {
+        // 수정 완료
+        // 세탁 아이디로 세탁 이름 얻음
+
+        Optional<LaundryInfo> byId = laundryInfoRepository.findById(laundryRequestDto.getLaundryId());
+
+        if(byId.isEmpty()){
+            return null;
+        }
+
         LaundryRequest newData = LaundryRequest.builder()
                 .laundryId(laundryRequestDto.getLaundryId())
+                .laundryName(byId.get().getName())
                 .email(laundryRequestDto.getEmail())
                 .gender(laundryRequestDto.getGender())
                 .colorTypes(laundryRequestDto.getColorTypes())
@@ -95,6 +105,7 @@ public class LaundryServiceImpl implements ILaundryService {
         LaundryRequest newData = LaundryRequest.builder()
                 ._id(origin.get_id())
                 .laundryId(origin.getLaundryId())
+                .laundryName(origin.getLaundryName())
                 .email(origin.getEmail())
                 .gender(origin.getGender())
                 .colorTypes(laundryRequestDto.getColorTypes())

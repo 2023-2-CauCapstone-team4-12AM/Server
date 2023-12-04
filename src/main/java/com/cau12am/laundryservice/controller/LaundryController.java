@@ -60,6 +60,12 @@ public class LaundryController {
 
         Map<String, Object> result = new HashMap<>();
 
+        if(saveRequest == null){
+            result.put("success",false);
+            result.put("message","실패");
+            return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
         result.put("success",true);
         result.put("message","성공");
         result.put("result", saveRequest);
