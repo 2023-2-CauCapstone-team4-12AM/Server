@@ -39,23 +39,23 @@ public class FCMNotificationService {
         }
     }
 
-    public ResultDto sendNotification(NotificationDto notificationDto){
-        Optional<FCMToken> tokenInfo = fcmTokenRepository.findById(notificationDto.getEmail());
+    public ResultDto sendNotification(String email, String title, String body){
+        Optional<FCMToken> tokenInfo = fcmTokenRepository.findById(email);
 
         if(tokenInfo.isEmpty()){
             return ResultDto.builder().message("상대방의 fcm토근이 존재하지 않습니다.").success(false).build();
         }
-        System.out.println("afdasdfsa");
+
         Notification notification = Notification.builder()
-                .setTitle(notificationDto.getTitle())
-                .setBody(notificationDto.getBody())
+                .setTitle(title)
+                .setBody(body)
                 .build();
-        System.out.println("afdasdfsa");
+
         Message message = Message.builder()
                 .setToken(tokenInfo.get().getToken())
                 .setNotification(notification)
                 .build();
-        System.out.println("afdasdfsa");
+
         try{
             firebaseMessaging.send(message);
             return ResultDto.builder().message("알람 보내기 성공").success(true).build();

@@ -9,6 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -29,7 +30,8 @@ public class LaundryRequest {
     private List<MachineType> machineTypes;
     private ExtraInfoType extraInfoType;
     private String message;
-    private Date date;
+    private LocalDateTime date;
+    private LocalDateTime expireDate;
     private boolean matched;
     @Version
     private long version;

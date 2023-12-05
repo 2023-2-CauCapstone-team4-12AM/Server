@@ -1,5 +1,6 @@
 package com.cau12am.laundryservice.domain.Match;
 
+import com.cau12am.laundryservice.domain.Laundry.LaundryRequest;
 import com.cau12am.laundryservice.domain.Laundry.tag.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +10,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -22,9 +24,11 @@ public class Match {
     private String _id;
     private String requestId;
     private String laundryName;
+    private LaundryRequest laundryRequest;
     private String url;
     private List<String> users;
-    private Date date;
+    private LocalDateTime date;
+    private Boolean notificationSuccess;
     @Version
     private long version;
 }

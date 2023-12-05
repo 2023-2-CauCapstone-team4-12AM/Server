@@ -46,7 +46,7 @@ public class NotificationController {
     public ResponseEntity<ResultDto> noticeMessage(@RequestBody NotificationDto notificationDto){
         log.info("fcm 알림보내는 컨트롤러 시작");
 
-        ResultDto result = fcmNotificationService.sendNotification(notificationDto);
+        ResultDto result = fcmNotificationService.sendNotification(notificationDto.getEmail(), notificationDto.getTitle(), notificationDto.getBody());
 
         if(!result.isSuccess()) {
             return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);

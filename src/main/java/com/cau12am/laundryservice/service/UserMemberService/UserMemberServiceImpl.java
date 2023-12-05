@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,7 @@ public class UserMemberServiceImpl implements IUserMemberService {
                     .name(checkMember.getName())
                     .studentID(checkMember.getStudentID())
                     .sex(checkMember.getSex())
+                    .ban(checkMember.getBan())
                     .build();
 
             userMemberRepository.save(newUser);
@@ -81,6 +83,7 @@ public class UserMemberServiceImpl implements IUserMemberService {
                     .name(checkMember.getName())
                     .studentID(checkMember.getStudentID())
                     .sex(checkMember.getSex())
+                    .ban(checkMember.getBan())
                     .build();
 
             userMemberRepository.save(newUser);
@@ -181,6 +184,7 @@ public class UserMemberServiceImpl implements IUserMemberService {
                     .name(userMemberDto.getName())
                     .studentID(userMemberDto.getStudentID())
                     .sex(userMemberDto.getSex())
+                    .ban(new ArrayList<String>())
                     .build();
 
             userMemberRepository.save(newUser);
@@ -230,7 +234,13 @@ public class UserMemberServiceImpl implements IUserMemberService {
             result.put("success", false);
             result.put("message", "이메일을 잘못입력하셨습니다.");
         } else{
-            UserMember info = UserMember.builder().sex(userMember.getSex()).name(userMember.getName()).studentID(userMember.getStudentID()).email(userMember.getEmail()).build();
+            UserMember info = UserMember.builder()
+                    .sex(userMember.getSex())
+                    .name(userMember.getName())
+                    .studentID(userMember.getStudentID())
+                    .email(userMember.getEmail())
+                    .ban(userMember.getBan())
+                    .build();
             result.put("user", info);
             result.put("success", true);
             result.put("message", "조회 완료");
@@ -278,6 +288,7 @@ public class UserMemberServiceImpl implements IUserMemberService {
                         .name(userMemberDto.getName())
                         .studentID(userMemberDto.getStudentID())
                         .sex(userMember.getSex())
+                        .ban(userMember.getBan())
                         .build();
                 userMemberRepository.save(newUser);
                 result.put("success", true);

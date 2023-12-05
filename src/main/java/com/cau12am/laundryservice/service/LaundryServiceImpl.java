@@ -3,6 +3,7 @@ package com.cau12am.laundryservice.service;
 import com.cau12am.laundryservice.domain.Laundry.*;
 import com.cau12am.laundryservice.domain.Match.MatchRepository;
 import com.cau12am.laundryservice.domain.Result.ResultDto;
+import com.cau12am.laundryservice.domain.Result.ResultLaundryRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.geo.Distance;
@@ -11,6 +12,7 @@ import org.springframework.data.geo.Point;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -44,8 +46,6 @@ public class LaundryServiceImpl implements ILaundryService {
 
     @Override
     public LaundryRequest saveRequest(LaundryRequestDto laundryRequestDto) {
-        // 수정 완료
-        // 세탁 아이디로 세탁 이름 얻음
 
         Optional<LaundryInfo> byId = laundryInfoRepository.findById(laundryRequestDto.getLaundryId());
 
@@ -63,7 +63,8 @@ public class LaundryServiceImpl implements ILaundryService {
                 .machineTypes(laundryRequestDto.getMachineTypes())
                 .extraInfoType(laundryRequestDto.getExtraInfoType())
                 .message(laundryRequestDto.getMessage())
-                .date(new Date())
+                .date(LocalDateTime.now())
+                .expireDate(LocalDateTime.now().plusDays(Integer.parseInt(laundryRequestDto.getExpireDay())))
                 .matched(false)
                 .build();
         return laundryRequestRepository.save(newData);
@@ -89,17 +90,17 @@ public class LaundryServiceImpl implements ILaundryService {
     }
 
     @Override
-    public Optional<LaundryRequest> updateRequest(LaundryRequestDto laundryRequestDto) {
+    public ResultLaundryRequestDto updateRequest(LaundryRequestDto laundryRequestDto) {
         Optional<LaundryRequest> originalRequest = laundryRequestRepository.findById(laundryRequestDto.get_id());
 
         if(originalRequest.isEmpty()){
-            return Optional.empty();
+            return ResultLaundryRequestDto.builder().success(false).message("찾는 구인글이 없습니다.").laundryRequest(null).build();
         }
 
         LaundryRequest origin = originalRequest.get();
 
         if(origin.isMatched()){
-            return Optional.empty();
+            return ResultLaundryRequestDto.builder().success(false).message("매칭되어있어 수정 불가능합니다.").laundryRequest(null).build();
         }
 
         LaundryRequest newData = LaundryRequest.builder()
@@ -114,12 +115,14 @@ public class LaundryServiceImpl implements ILaundryService {
                 .extraInfoType(laundryRequestDto.getExtraInfoType())
                 .message(laundryRequestDto.getMessage())
                 .date(origin.getDate())
+                .expireDate(origin.getExpireDate())
                 .matched(origin.isMatched())
                 .version(origin.getVersion())
                 .build();
 
-        return Optional.of(laundryRequestRepository.save(newData));
-    }
+        laundryRequestRepository.save(newData);
 
+        return ResultLaundryRequestDto.builder().success(true).message("성공").laundryRequest(newData).build();
+    }
 
 }

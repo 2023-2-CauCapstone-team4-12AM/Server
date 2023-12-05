@@ -57,6 +57,7 @@ public class MatchController {
         ResultDto matches = iMatchService.deleteMatch(id);
 
         System.out.println(matches.isSuccess());
+        System.out.println(matches.getMessage());
 
         if(!matches.isSuccess()){
             return new ResponseEntity<>(matches, HttpStatus.INTERNAL_SERVER_ERROR);

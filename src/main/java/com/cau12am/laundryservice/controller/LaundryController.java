@@ -3,6 +3,7 @@ package com.cau12am.laundryservice.controller;
 import com.cau12am.laundryservice.domain.Laundry.*;
 import com.cau12am.laundryservice.domain.Result.ResultDto;
 import com.cau12am.laundryservice.domain.Result.ResultLaundryInfoDto;
+import com.cau12am.laundryservice.domain.Result.ResultLaundryRequestDto;
 import com.cau12am.laundryservice.service.ILaundryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -74,23 +75,16 @@ public class LaundryController {
     }
 
     @PutMapping("/myRequest/update")
-    public ResponseEntity<Map<String, Object>> updateMyRequest(@RequestBody LaundryRequestDto laundryRequestDto){
+    public ResponseEntity<ResultLaundryRequestDto> updateMyRequest(@RequestBody LaundryRequestDto laundryRequestDto){
         log.info("자신이 쓴 요청글 수정 컨트롤러 시작");
 
-        Optional<LaundryRequest> saveRequest = iLaundryService.updateRequest(laundryRequestDto);
+        ResultLaundryRequestDto result = iLaundryService.updateRequest(laundryRequestDto);
 
-        Map<String, Object> result = new HashMap<>();
+        System.out.println(result.getLaundryRequest());
 
-        if(saveRequest.isEmpty()) {
-            result.put("success",false);
-            result.put("message","업데이트를 할 수 없습니다.");
-            result.put("result", null);
+        if(!result.isSuccess()) {
             return new ResponseEntity<>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        result.put("success",true);
-        result.put("message","성공");
-        result.put("result", saveRequest.get());
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -116,6 +110,7 @@ public class LaundryController {
         Optional<LaundryRequest> request = iLaundryService.findRequestById(Id);
 
         Map<String, Object> result = new HashMap<>();
+        System.out.println(result);
 
         if(request.isEmpty()) {
             result.put("success",false);

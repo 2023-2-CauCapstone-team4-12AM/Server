@@ -9,6 +9,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Document(collection = "user")
 @Getter
 @NoArgsConstructor
@@ -22,4 +24,5 @@ public class UserMember {
     private String name;
     private String studentID;
     private String sex;
+    private List<String> ban;
 }

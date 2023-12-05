@@ -17,4 +17,5 @@ public class LaundryRequestDto {
     List<MachineType> machineTypes;
     ExtraInfoType extraInfoType;
     String message;
+    String expireDay;
 }
