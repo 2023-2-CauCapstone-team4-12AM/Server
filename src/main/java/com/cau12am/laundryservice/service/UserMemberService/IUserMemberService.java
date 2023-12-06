@@ -1,6 +1,7 @@
 package com.cau12am.laundryservice.service.UserMemberService;
 
 
+import com.cau12am.laundryservice.domain.Result.ResultDto;
 import com.cau12am.laundryservice.domain.User.UserMemberDto;
 
 import java.util.Map;
@@ -24,5 +25,4 @@ public interface IUserMemberService {
     public Map<String, Object> deleteAccount(String email, String pw);
 
     public Map<String, Object> updateAccount(UserMemberDto userMemberDto);
-
 }

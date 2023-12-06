@@ -1,9 +1,13 @@
 package com.cau12am.laundryservice.service;
 
+import com.cau12am.laundryservice.domain.Ban.Ban;
+import com.cau12am.laundryservice.domain.Ban.BanRepository;
 import com.cau12am.laundryservice.domain.Laundry.*;
 import com.cau12am.laundryservice.domain.Match.MatchRepository;
 import com.cau12am.laundryservice.domain.Result.ResultDto;
 import com.cau12am.laundryservice.domain.Result.ResultLaundryRequestDto;
+import com.cau12am.laundryservice.domain.User.UserMember;
+import com.cau12am.laundryservice.domain.User.UserMemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.geo.Distance;
@@ -16,6 +20,8 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -24,6 +30,7 @@ import java.util.Optional;
 public class LaundryServiceImpl implements ILaundryService {
     private final LaundryInfoRepository laundryInfoRepository;
     private final LaundryRequestRepository laundryRequestRepository;
+    private final BanRepository banRepository;
     @Override
     public List<LaundryInfo> findLaundry(String lon, String lat, String dis) {
         log.info("근처 코인세탁소 찾는 서비스 시작");
@@ -35,8 +42,19 @@ public class LaundryServiceImpl implements ILaundryService {
     }
 
     @Override
-    public List<LaundryRequest> findLaundryALLRequests(String laundryId) {
-        return laundryRequestRepository.findByLaundryIdAndMatchedIsFalse(laundryId);
+    public List<LaundryRequest> findLaundryALLRequests(String email, String laundryId) {
+        Optional<Ban> byId = banRepository.findById(email);
+        List<Ban> byBanList = banRepository.findByBanList(email);
+
+        if(byId.isEmpty()){
+            return null;
+        }
+
+        List<String> emails = Stream.concat(byId.get().getBanList().stream(), byBanList.stream().map(Ban::getEmail)).distinct().collect(Collectors.toList());
+        System.out.println(emails);
+
+        return laundryRequestRepository.findByLaundryIdAndMatchedIsFalseAndEmailNotIn(laundryId, emails);
+
     }
 
     @Override
@@ -52,7 +70,7 @@ public class LaundryServiceImpl implements ILaundryService {
         if(byId.isEmpty()){
             return null;
         }
-
+        
         LaundryRequest newData = LaundryRequest.builder()
                 .laundryId(laundryRequestDto.getLaundryId())
                 .laundryName(byId.get().getName())

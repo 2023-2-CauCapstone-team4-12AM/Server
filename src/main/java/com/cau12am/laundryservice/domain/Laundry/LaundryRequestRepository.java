@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LaundryRequestRepository extends MongoRepository<LaundryRequest, String> {
-    List<LaundryRequest> findByLaundryIdAndMatchedIsFalse(String laundryId);
+    List<LaundryRequest> findByLaundryIdAndMatchedIsFalseAndEmailNotIn(String laundryId, List<String> email);
     List<LaundryRequest> findByEmail(String email);
 
     Optional<LaundryRequest> findOneBy_id(String Id);

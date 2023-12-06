@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface ILaundryService {
     List<LaundryInfo> findLaundry(String lan, String lat, String dis);
-    List<LaundryRequest> findLaundryALLRequests(String laundryId);
+    List<LaundryRequest> findLaundryALLRequests(String email, String laundryId);
 
     List<LaundryRequest> findAllMyRequestsByEmail(String email);
 

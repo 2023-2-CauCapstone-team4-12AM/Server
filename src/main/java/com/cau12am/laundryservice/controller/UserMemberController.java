@@ -2,6 +2,7 @@ package com.cau12am.laundryservice.controller;
 
 import com.cau12am.laundryservice.domain.Email.EmailCodeDto;
 import com.cau12am.laundryservice.domain.Email.EmailPasswordDto;
+import com.cau12am.laundryservice.domain.Result.ResultDto;
 import com.cau12am.laundryservice.domain.User.UserMemberDto;
 import com.cau12am.laundryservice.service.UserMemberService.IUserMemberService;
 import jakarta.validation.Valid;
@@ -138,5 +139,4 @@ public class UserMemberController {
         return new ResponseEntity<>(result, HttpStatus.OK);
 
     }
-
 }

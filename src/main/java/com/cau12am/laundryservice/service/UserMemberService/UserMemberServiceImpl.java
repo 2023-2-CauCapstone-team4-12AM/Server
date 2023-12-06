@@ -1,7 +1,10 @@
 package com.cau12am.laundryservice.service.UserMemberService;
 
+import com.cau12am.laundryservice.domain.Ban.Ban;
+import com.cau12am.laundryservice.domain.Ban.BanRepository;
 import com.cau12am.laundryservice.domain.Email.EmailCode;
 import com.cau12am.laundryservice.domain.Email.EmailCodeRepository;
+import com.cau12am.laundryservice.domain.Result.ResultDto;
 import com.cau12am.laundryservice.domain.User.UserMember;
 import com.cau12am.laundryservice.domain.User.UserMemberDto;
 import com.cau12am.laundryservice.domain.User.UserMemberRepository;
@@ -13,11 +16,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.xml.transform.Result;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -28,6 +29,7 @@ public class UserMemberServiceImpl implements IUserMemberService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final EmailCodeRepository emailCodeRepository;
+    private final BanRepository banRepository;
 
 
     public Map<String, Object> changePW(String email, String nowPW, String newPW) {
@@ -49,7 +51,6 @@ public class UserMemberServiceImpl implements IUserMemberService {
                     .name(checkMember.getName())
                     .studentID(checkMember.getStudentID())
                     .sex(checkMember.getSex())
-                    .ban(checkMember.getBan())
                     .build();
 
             userMemberRepository.save(newUser);
@@ -83,7 +84,6 @@ public class UserMemberServiceImpl implements IUserMemberService {
                     .name(checkMember.getName())
                     .studentID(checkMember.getStudentID())
                     .sex(checkMember.getSex())
-                    .ban(checkMember.getBan())
                     .build();
 
             userMemberRepository.save(newUser);
@@ -168,7 +168,7 @@ public class UserMemberServiceImpl implements IUserMemberService {
             return data;
         }
 
-        if(emailCheck.isCheck() == false){
+        if(!emailCheck.isCheck()){
             data.put("success", false);
             return data;
         }
@@ -184,10 +184,12 @@ public class UserMemberServiceImpl implements IUserMemberService {
                     .name(userMemberDto.getName())
                     .studentID(userMemberDto.getStudentID())
                     .sex(userMemberDto.getSex())
-                    .ban(new ArrayList<String>())
                     .build();
 
+            Ban newBan = Ban.builder().email(userMemberDto.getEmail()).banList(new ArrayList<>()).build();
+
             userMemberRepository.save(newUser);
+            banRepository.save(newBan);
             emailCodeRepository.delete(emailCheck);
 
             data.put("success", true);
@@ -229,19 +231,29 @@ public class UserMemberServiceImpl implements IUserMemberService {
     @Override
     public Map<String, Object> findUserInfo(String email) {
         UserMember userMember = userMemberRepository.findOneByEmail(email).orElse(null);
+        Ban ban = banRepository.findById(email).orElse(null);
         Map<String, Object> result = new HashMap<>();
         if(userMember == null){
             result.put("success", false);
             result.put("message", "이메일을 잘못입력하셨습니다.");
         } else{
+
             UserMember info = UserMember.builder()
                     .sex(userMember.getSex())
                     .name(userMember.getName())
                     .studentID(userMember.getStudentID())
                     .email(userMember.getEmail())
-                    .ban(userMember.getBan())
                     .build();
             result.put("user", info);
+
+            if(ban == null){
+                Ban newBan = Ban.builder().email(email).banList(new ArrayList<>()).build();
+                banRepository.save(newBan);
+                result.put("ban",newBan.getBanList());
+            } else {
+                result.put("ban",ban.getBanList());
+            }
+
             result.put("success", true);
             result.put("message", "조회 완료");
         }
@@ -288,7 +300,6 @@ public class UserMemberServiceImpl implements IUserMemberService {
                         .name(userMemberDto.getName())
                         .studentID(userMemberDto.getStudentID())
                         .sex(userMember.getSex())
-                        .ban(userMember.getBan())
                         .build();
                 userMemberRepository.save(newUser);
                 result.put("success", true);
@@ -301,4 +312,5 @@ public class UserMemberServiceImpl implements IUserMemberService {
         }
         return result;
     }
+
 }

@@ -39,11 +39,11 @@ public class LaundryController {
     }
 
     @GetMapping("/request/allInLaundry")
-    public ResponseEntity<Map<String, Object>> findLaundryRequest(@RequestParam(name = "laundryId") @Valid String laundryId){
+    public ResponseEntity<Map<String, Object>> findLaundryRequest(@RequestParam(name = "email") @Valid String email, @RequestParam(name = "laundryId") @Valid String laundryId){
 
         log.info("특정 코인세탁소 요청글 찾는 컨트롤러 시작");
 
-        List<LaundryRequest> requests = iLaundryService.findLaundryALLRequests(laundryId);
+        List<LaundryRequest> requests = iLaundryService.findLaundryALLRequests(email, laundryId);
 
         Map<String, Object> result = new HashMap<>();
         result.put("success",true);
