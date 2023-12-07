@@ -275,6 +275,7 @@ public class UserMemberServiceImpl implements IUserMemberService {
 
                 if(banList.isPresent()){
                     banRepository.delete(banList.get());
+
                 }
 
                 userMemberRepository.delete(userMember);
