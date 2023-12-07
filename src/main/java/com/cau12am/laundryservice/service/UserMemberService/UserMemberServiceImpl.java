@@ -271,6 +271,12 @@ public class UserMemberServiceImpl implements IUserMemberService {
             result.put("message", "이메일을 잘못입력하셨습니다.");
         } else{
             if(passwordEncoder.matches(pw, userMember.getPw())){
+                Optional<Ban> banList = banRepository.findById(email);
+
+                if(banList.isPresent()){
+                    banRepository.delete(banList.get());
+                }
+
                 userMemberRepository.delete(userMember);
                 result.put("success", true);
                 result.put("message", "삭제 완료");
